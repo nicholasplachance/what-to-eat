@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+// CSS
 import './App.css';
 
+// Components imports
+import ScoreSection from './components/scoreSection/scoreSection';
+import AnswerSection from './components/answerSection/answerSection';
+import QuestionSection from './components/questionSection/questionSection';
 export default function App() {
 	const questions = [
 		{
 			questionText: 'What type of meal are you feeling?',
 			answerOptions: [
-				{ answerText: 'Breakkyy' },
-				{ answerText: 'Lunch Time, yo' },
-				{ answerText: 'Din-din' },
-				{ answerText: 'Snacky' }
+				{ answerText: 'Breakfast' },
+				{ answerText: 'Lunchtime' },
+				{ answerText: 'din-din' },
+				{ answerText: 'snacky snack' }
 			]
 		},
 		{
@@ -43,6 +50,8 @@ export default function App() {
 
 	const [currentQuestion, setCurrentQuestion] = useState(0);
 	const [showScore, setShowScore] = useState(false);
+	const [showChoseNumber, setShowChoseNumber] = useState(true);
+	const [choseNumber, setChoseNumber] = useState(0);
 	const [score, setScore] = useState(0);
 	const [chosenAnswer, setChosenAnswers] = useState([]);
 
@@ -57,31 +66,50 @@ export default function App() {
 		console.log(answerText);
 	};
 
+	const reset = () => {
+		setShowChoseNumber(!showChoseNumber);
+		setShowScore(!showScore);
+		setCurrentQuestion(0);
+		setChosenAnswers([]);
+		setChoseNumber(0);
+	};
+
+	const handleNumberButtonClick = (num) => {
+		setShowChoseNumber(!showChoseNumber);
+		setChoseNumber(num);
+	};
+
 	return (
-		<div className='app'>
-			{showScore ? (
-				<div className='score-section'>
-					{chosenAnswer.map((answer) => (
-						<p>{answer}</p>
-					))}
-				</div>
-			) : (
-				<>
-					<div className='question-section'>
-						<div className='question-count'>
-							<span>Question {currentQuestion + 1}</span>/{questions.length}
-						</div>
-						<div className='question-text'>{questions[currentQuestion].questionText}</div>
+		<div>
+			<h1 className='title'>Hungry Boyss</h1>
+			<div className='app'>
+				{showChoseNumber ? (
+					<div>
+						<h2>How many people are eating?</h2>
+						<button onClick={() => handleNumberButtonClick(1)}>1</button>
+						<button onClick={() => handleNumberButtonClick(2)}>2</button>
 					</div>
-					<div className='answer-section'>
-						{questions[currentQuestion].answerOptions.map((answerOption, index) => (
-							<button key={index} onClick={() => handleAnswerButtonClick(answerOption.answerText)}>
-								{answerOption.answerText}
-							</button>
-						))}
+				) : showScore ? (
+					<div>
+						<ScoreSection chosenAnswer={chosenAnswer} />
+						<button onClick={() => reset()}>Reset</button>
 					</div>
-				</>
-			)}
+				) : (
+					<>
+						<QuestionSection
+							questions={questions}
+							currentQuestion={currentQuestion}
+							currentQuestion={currentQuestion}
+							choseNumber={choseNumber}
+						/>
+						<AnswerSection
+							questions={questions}
+							currentQuestion={currentQuestion}
+							handleAnswerButtonClick={handleAnswerButtonClick}
+						/>
+					</>
+				)}
+			</div>
 		</div>
 	);
 }
